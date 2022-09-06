@@ -81,6 +81,7 @@ dns_huaweicloud_rm() {
   HUAWEICLOUD_Username="${HUAWEICLOUD_Username:-$(_readaccountconf_mutable HUAWEICLOUD_Username)}"
   HUAWEICLOUD_Password="${HUAWEICLOUD_Password:-$(_readaccountconf_mutable HUAWEICLOUD_Password)}"
   HUAWEICLOUD_ProjectID="${HUAWEICLOUD_ProjectID:-$(_readaccountconf_mutable HUAWEICLOUD_ProjectID)}"
+  HUAWEICLOUD_Domain="${HUAWEICLOUD_Domain:-$(_readaccountconf_mutable HUAWEICLOUD_Domain)}"
 
   # Check information
   if [ -z "${HUAWEICLOUD_Username}" ] || [ -z "${HUAWEICLOUD_Password}" ] || [ -z "${HUAWEICLOUD_ProjectID}" ]; then
@@ -88,8 +89,13 @@ dns_huaweicloud_rm() {
     return 1
   fi
 
+  # Consider about IAM user
+  if [ -z "${HUAWEICLOUD_Domain}" ]; then
+    HUAWEICLOUD_Domain="${HUAWEICLOUD_Username}"
+  fi
+
   unset token # Clear token
-  token="$(_get_token "${HUAWEICLOUD_Username}" "${HUAWEICLOUD_Password}" "${HUAWEICLOUD_ProjectID} "${HUAWEICLOUD_Domain}")" 
+  token="$(_get_token "${HUAWEICLOUD_Username}" "${HUAWEICLOUD_Password}" "${HUAWEICLOUD_ProjectID}" "${HUAWEICLOUD_Domain}")" 
   if [ -z "${token}" ]; then # Check token
     _err "dns_api(dns_huaweicloud): Error getting token."
     return 1
